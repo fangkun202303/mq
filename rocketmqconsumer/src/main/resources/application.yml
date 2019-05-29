@@ -1,0 +1,31 @@
+server:
+  port: 8889
+spring:
+  application:
+    name: rocketmqconsumer
+  # 数据库相关的连接
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/testbasedata?characterEncoding=utf8&useSSL=false&serverTimezone=UTC&rewriteBatchedStatements=true
+    driver-class-name: com.mysql.jdbc.Driver
+    type: com.zaxxer.hikari.HikariDataSource
+    hikari:
+      password: root
+      username: root
+      minimum-idle: 5
+      maximum-pool-size: 15
+      auto-commit: true
+      idle-timeout: 30000
+      pool-name: DateHikariCP
+      max-lifetime: 1800000
+      connection-timeout: 30000
+      connection-test-query: SELECT 1
+
+
+rocketmq:
+  consumer:
+    nameServerAddr: localhost:9876
+    group: "test"
+    topic: "demo"
+mybatis:
+  mapper-locations: classpath:mybatis/mapper/*Mapper.xml
+  config-location: classpath:mybatis/mybatis-config.xml
