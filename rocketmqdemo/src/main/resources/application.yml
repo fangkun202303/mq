@@ -28,7 +28,7 @@ rocketmq:
     groupName: "test"
     nameServerAddr: localhost:9876
     default: false
-    topic: "demo"
+    topic: "demo1"
 
 mybatis:
   mapper-locations: classpath:mybatis/mapper/*Mapper.xml

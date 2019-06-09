@@ -1,10 +1,9 @@
 package com.mq.rocketmqdemo.controller;
 
+import com.alibaba.fastjson.JSON;
+import com.mq.rocketmqdemo.service.UserService;
 import org.apache.rocketmq.client.exception.MQClientException;
-import org.apache.rocketmq.client.producer.DefaultMQProducer;
-import org.apache.rocketmq.client.producer.MessageQueueSelector;
-import org.apache.rocketmq.client.producer.SendCallback;
-import org.apache.rocketmq.client.producer.SendResult;
+import org.apache.rocketmq.client.producer.*;
 import org.apache.rocketmq.common.message.Message;
 import org.apache.rocketmq.common.message.MessageQueue;
 import org.slf4j.Logger;
@@ -15,9 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import static com.alibaba.fastjson.JSON.*;
 
@@ -35,6 +32,9 @@ public class IndexController {
 
     @Autowired
     public DefaultMQProducer defaultMQProducer;
+
+    @Autowired
+    public UserService userService;
 
     @SuppressWarnings("all")
     @GetMapping("/testmesg")
@@ -174,14 +174,65 @@ public class IndexController {
             // ============================================
             // ======        分隔符        =================
             // ============================================
-            /**
-             * version 6.0 消息事务
-             */
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         return toJSONString(m);
+    }
+
+    @Autowired
+    public TransactionMQProducer transactionMQProducer;
+
+    @GetMapping("/send")
+    public Object sendTransactionMsg(String msg){
+        TransactionSendResult sendResult =null;
+        /**
+         * version 6.0 消息事务
+         */
+//        String[] tags = new String[]{"创建订单", "支付", "发货", "收货", "五星好评"};
+//        for(int x=0; x<20;x++){
+//            /**
+//             * topic 消息主题
+//             * tag: 消息表示,就是消息的二级分类
+//             * key: 就是让消费者有顺序的消费,举例: 订单id,这个订单下的 "创建订单", "支付", "发货", "收货", "五星好评"
+//             *            有顺序的处理
+//             * message:消息
+//             **/
+//
+//            try {
+//                sendResult = transactionMQProducer.sendMessageInTransaction(
+//                        new Message("demo", tags[x % tags.length], "yonghuID" + x / 5, (msg + x + tags[x % tags.length]).getBytes()),
+//                        x / 5);
+//                System.out.printf("%s%n", sendResult);
+//            if(sendResult==null){
+//                // 说明发送失败
+//                throw new RuntimeException("消息没有发送成功!");
+//            }
+//            } catch (MQClientException e) {
+//                e.printStackTrace();
+//                System.out.printf("%s%n", e.getLocalizedMessage());
+//            }
+//        }
+
+
+        Map<String,Object> map=new HashMap<>();
+        map.put("CODE", "ziye");
+        map.put("NAME","子夜笙歌落");
+        map.put("USERID", 1);
+        map.put("USERNAME", "笙歌");
+        Message message = new Message("demo", "", "", JSON.toJSONString(map).getBytes());
+        try {
+            sendResult = transactionMQProducer.sendMessageInTransaction(message, null);
+            if(sendResult==null){
+                // 说明发送失败
+                throw new RuntimeException("消息没有发送成功!");
+            }
+        } catch (MQClientException e) {
+            e.printStackTrace();
+            System.out.printf("%s%n", e.getLocalizedMessage());
+        }
+        return sendResult;
     }
 
 }

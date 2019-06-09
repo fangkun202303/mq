@@ -1,5 +1,8 @@
 package com.mq.rocketmqconsumer.config;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.mq.rocketmqconsumer.domain.Orders;
 import com.mq.rocketmqconsumer.service.Msghandler;
 import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyStatus;
 import org.apache.rocketmq.client.consumer.listener.ConsumeOrderlyStatus;
@@ -15,6 +18,7 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.List;
+
 
 /**
  * @description: 根据不同主题自定义一个监听
@@ -44,25 +48,42 @@ public class MyRocketMqConfigConsumer extends RocketMqConfigConsumer implements 
         logger.info("收到消息的时间是: "+new Date().toString()+"开始处理消息了!!!! ");
         ConsumeConcurrentlyStatus consumeConcurrentlyStatus=null;
         logger.info("这个消息集合的长度是: "+msgs.size());
-        for (MessageExt msg : msgs){
+        for (MessageExt msg : msgs)
             try {
-                logger.info("这个消息的消息ID是: "+msg.getMsgId());
-                if(new String(msg.getBody(),"utf-8").equals("子夜笙歌落第二个失败测试")){
-                    logger.info("这个消息是: "+new String(msg.getBody(),"utf-8"));
-                    throw new RuntimeException();
-                }
-                msghandler.msgHandler("这个消息是: "+new String(msg.getBody(),"utf-8"));
-            } catch (UnsupportedEncodingException ex) {
+                logger.info("这个消息的消息ID是: " + msg.getMsgId());
+//                if(new String(msg.getBody(),"utf-8").equals("子夜笙歌落第二个失败测试")){
+//                    logger.info("这个消息是: "+new String(msg.getBody(),"utf-8"));
+//                    throw new RuntimeException();
+//                }
+//                msghandler.msgHandler("这个消息是: "+new String(msg.getBody(),"utf-8"));
+
+                // 真正的处理业务了，   START
+                /*
+                 *      map.put("CODE", "ziye");
+                        map.put("NAME","子夜笙歌落");
+                        map.put("USERID", 2);
+                        map.put("USERNAME", "笙歌");
+                 */
+                JSONObject object = JSON.parseObject(new String(msg.getBody(),"utf-8"));
+                Orders orders = new Orders();
+                orders.id=12121;
+                orders.code=object.get("CODE").toString();
+                orders.name=object.get("NAME").toString();
+                orders.userId=(Integer) object.get("USERID");
+                Integer integer = msghandler.insertOneOrder(orders);
+                return integer==1? ConsumeConcurrentlyStatus.CONSUME_SUCCESS:ConsumeConcurrentlyStatus.RECONSUME_LATER;
+                // 真正的处理业务了，   END
+            } catch (Exception ex) {
+                System.out.printf(ex.getMessage());
                 logger.info("消息编码出现异常!!!! 向合格消息重发");
                 return ConsumeConcurrentlyStatus.RECONSUME_LATER;
             }
-        }
-        try {
-            logger.info("睡两秒!!!");
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            logger.info("睡两秒!!!");
+//            Thread.sleep(2000);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
         // 返回消息处理的状态,
         return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
     }

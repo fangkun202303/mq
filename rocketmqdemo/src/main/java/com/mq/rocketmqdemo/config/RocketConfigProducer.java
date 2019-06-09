@@ -33,7 +33,7 @@ public class RocketConfigProducer {
      * @return org.apache.rocketmq.client.producer.DefaultMQProducer
      * @createDate 2019/5/28 14:30
      **/
-    @Bean
+//    @Bean
 //    @ConditionalOnProperty(prefix = "rocketmq.producer", value = "default", havingValue = "true")
     public DefaultMQProducer defaultMQProducer() throws MQClientException {
         logger.info("加载这个配置了========.>>>>>>>");

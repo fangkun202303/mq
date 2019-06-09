@@ -113,6 +113,18 @@ public abstract class RocketMqConfigConsumer {
          * version 5.0 过滤,最简单的过滤就是 consumer.subscribe(topic,tag); 这就是过滤,只收这个主题下,这个标识的消息,代码就不实现了
          */
 
+        /*
+         * 事务
+         */
+        consumer.subscribe(topic,"*");
+        // 开启内部类实现监听
+        consumer.registerMessageListener(new MessageListenerConcurrently() {
+            @Override
+            public ConsumeConcurrentlyStatus consumeMessage(List<MessageExt> msgs, ConsumeConcurrentlyContext context) {
+                return RocketMqConfigConsumer.this.bodyhadler(msgs);
+            }
+        });
+
         logger.info("消费者上线了");
         consumer.start();
     }

@@ -4,6 +4,7 @@ import com.mq.rocketmqdemo.domain.User;
 import com.mq.rocketmqdemo.mapper.UserMapper;
 import com.mq.rocketmqdemo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @version： 1.0.0
  * @create: 2019-05-29
  */
+@Service
 public class UserServiceImpl implements UserService {
 
     @Autowired

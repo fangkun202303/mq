@@ -16,6 +16,6 @@ import org.springframework.stereotype.Repository;
 @Mapper
 public interface UserMapper {
 
-    @Insert("insert into user (name) values (#{name})")
+    @Insert("insert into user (id,name) values (#{id},#{name})")
     public Integer insertOneUser(User user);
 }
